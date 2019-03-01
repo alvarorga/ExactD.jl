@@ -4,16 +4,19 @@ Functions to build many-body operators.
 
 include("./states.jl")
 
-function build_many_body_op(L, N, J)
+function build_many_body_op(L::Int, N::Int,
+                            J::Array{T, 2} where T=Union{Float64, ComplexF64})
     """
     Build many-body operator from the hopping matrix J.
 
-    The basis states have L sites and N particles. J is the hopping
-    matrix:
-        ``J = \\sum_{ij} b^\\dagger_i b_j``
+    # Arguments:
+    - `L::Int`: number of sites.
+    - `N::Int`: number of particles.
+    - `J::Int`: hopping matrix:
+        ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
     """
     # Basis of states and dimension of the Hilbert space.
-    states = _get_states(L, N)
+    states = _get_LN_states(L, N)
     dH = length(states)
 
     # Make the many-body operator of the same type as J.

@@ -2,7 +2,7 @@
 Functions to compute Fock basis states.
 """
 
-function _get_states(L, N)
+function _get_LN_states(L::Int, N::Int)
     """
     Compute states with L sites and N particles.
     """
