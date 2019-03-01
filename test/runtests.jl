@@ -27,4 +27,12 @@ end
     @test Op[4, 2] ≈ 12.
     @test Op[6, 1] ≈ 0.
     @test Op[3, 5] ≈ 15.
+
+    C = 1.3
+    Op2 = build_many_body_op(L, N, J, C)
+
+    # Diagonal terms.
+    @test Op2[1, 1] ≈ 8.3
+    @test Op2[4, 4] ≈ 18.3
+    @test Op2[6, 6] ≈ 28.3
 end
