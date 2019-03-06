@@ -6,20 +6,20 @@ using SparseArrays
 
 include("./states.jl")
 
+"""
+Build many-body operator from the hopping matrix J.
+
+# Arguments:
+- `L::Int`: number of sites.
+- `N::Int`: number of particles.
+- `J::Array{T, 2}`: hopping matrix:
+    ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
+- `C::Union{Float64, ComplexF64}=0.`: constant term added to the
+    diagonal of the many-body operator.
+"""
 function build_many_body_op(L::Int, N::Int,
                             J::Array{T, 2} where T=Union{Float64, ComplexF64},
                             C::Union{Float64, ComplexF64}=0.)
-    """
-    Build many-body operator from the hopping matrix J.
-
-    # Arguments:
-    - `L::Int`: number of sites.
-    - `N::Int`: number of particles.
-    - `J::Array{T, 2}`: hopping matrix:
-        ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
-    - `C::Union{Float64, ComplexF64}=0.`: constant term added to the
-        diagonal of the many-body operator.
-    """
     # Basis of states and dimension of the Hilbert space.
     states = _get_LN_states(L, N)
     dH = length(states)
@@ -54,21 +54,21 @@ function build_many_body_op(L::Int, N::Int,
     return Op
 end
 
+"""
+Build sparse many-body operator from the matrix J.
+
+# Arguments:
+- `L::Int`: number of sites.
+- `N::Int`: number of particles.
+- `J::Array{T, 2}`: hopping matrix:
+    ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
+- `C::Union{Float64, ComplexF64}=0.`: constant term added to the
+    diagonal of the many-body operator.
+"""
 function build_sparse_many_body_op(L::Int, N::Int,
                                    J::Array{T, 2} where T=Union{Float64,
                                                                 ComplexF64},
                                    C::Union{Float64, ComplexF64}=0.)
-    """
-    Build sparse many-body operator from the matrix J.
-
-    # Arguments:
-    - `L::Int`: number of sites.
-    - `N::Int`: number of particles.
-    - `J::Array{T, 2}`: hopping matrix:
-        ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
-    - `C::Union{Float64, ComplexF64}=0.`: constant term added to the
-        diagonal of the many-body operator.
-    """
     # Basis of states and dimension of the Hilbert space.
     states = _get_LN_states(L, N)
     dH = length(states)

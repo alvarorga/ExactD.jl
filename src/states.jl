@@ -2,10 +2,10 @@
 Functions to compute Fock basis states.
 """
 
+"""
+Compute states with L sites and N particles.
+"""
 function _get_LN_states(L::Int, N::Int)
-    """
-    Compute states with L sites and N particles.
-    """
     states = zeros(Int, binomial(L, N))
     tmp = 1
     for i=0:(1<<L)-1
