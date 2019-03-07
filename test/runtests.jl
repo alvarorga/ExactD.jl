@@ -10,6 +10,31 @@ using Test
     @test states[6] == 12
 end
 
+@testset "spin 1 states with L spins and Sz magnetization" begin
+    L = 4
+    Sz = 2
+    states = ExactD._get_spin1_LSz_states(L, Sz)
+
+    @test length(states) == 10
+    @test states[1] == 5
+    @test states[3] == 20
+    @test states[5] == 68
+    @test states[7] == 86
+    @test states[10] == 149
+
+    L = 4
+    Sz = 1
+    states = ExactD._get_spin1_LSz_states(L, Sz)
+
+    @test length(states) == 16
+    @test states[1] == 1
+    @test states[3] == 16
+    @test states[5] == 25
+    @test states[8] == 70
+    @test states[10] == 82
+    @test states[16] == 148
+end
+
 @testset "dense many-body operator" begin
     L = 4
     N = 2
