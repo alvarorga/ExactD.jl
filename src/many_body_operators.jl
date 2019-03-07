@@ -7,13 +7,17 @@ using SparseArrays
 include("./states.jl")
 
 """
+    build_many_body_op(L::Int, N::Int,
+                       J::Array{T, 2} where T=Union{Float64, ComplexF64},
+                       C::Union{Float64, ComplexF64}=0.)
+
 Build many-body operator from the hopping matrix J.
 
 # Arguments:
 - `L::Int`: number of sites.
 - `N::Int`: number of particles.
 - `J::Array{T, 2}`: hopping matrix:
-    ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
+    ``J = ∑_{ij} J_{i,j} b^†_i b_j``
 - `C::Union{Float64, ComplexF64}=0.`: constant term added to the
     diagonal of the many-body operator.
 """
@@ -55,13 +59,17 @@ function build_many_body_op(L::Int, N::Int,
 end
 
 """
+    build_sparse_many_body_op(L::Int, N::Int,
+                              J::Array{T, 2} where T=Union{Float64, ComplexF64},
+                              C::Union{Float64, ComplexF64}=0.)
+
 Build sparse many-body operator from the matrix J.
 
 # Arguments:
 - `L::Int`: number of sites.
 - `N::Int`: number of particles.
 - `J::Array{T, 2}`: hopping matrix:
-    ``J = \\sum_{ij} J_{i,j} b^\\dagger_i b_j``
+    ``J = ∑_{ij} J_{i,j} b^†_i b_j``
 - `C::Union{Float64, ComplexF64}=0.`: constant term added to the
     diagonal of the many-body operator.
 """
