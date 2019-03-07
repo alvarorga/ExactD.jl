@@ -2,7 +2,9 @@ using ExactD
 using Test
 
 @testset "states with N particles and L sites" begin
-    states = ExactD._get_LN_states(4, 2)
+    L = 4
+    N = 2
+    states = ExactD._get_LN_states(L, N)
 
     @test states[1] == 3
     @test states[3] == 6
@@ -38,7 +40,7 @@ end
 @testset "dense many-body operator" begin
     L = 4
     N = 2
-    J::Array{Float64, 2} = reshape(collect(1:16), (4, 4))
+    J::Array{Float64, 2} = reshape(collect(1:16), (L, L))
     Op = build_many_body_op(L, N, J)
 
     # Diagonal terms.
@@ -65,7 +67,7 @@ end
 @testset "sparse many-body operator" begin
     L = 4
     N = 2
-    J::Array{Float64, 2} = reshape(collect(1:16), (4, 4))
+    J::Array{Float64, 2} = reshape(collect(1:16), (L, L))
     Op = build_sparse_many_body_op(L, N, J)
 
     # Diagonal terms.
