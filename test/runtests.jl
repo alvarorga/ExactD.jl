@@ -40,7 +40,7 @@ end
 @testset "dense many-body operator" begin
     L = 4
     N = 2
-    J::Array{Float64, 2} = reshape(collect(1:16), (L, L))
+    J::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
     Op = build_many_body_op(L, N, J)
 
     # Diagonal terms.
@@ -67,7 +67,7 @@ end
 @testset "sparse many-body operator" begin
     L = 4
     N = 2
-    J::Array{Float64, 2} = reshape(collect(1:16), (L, L))
+    J::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
     Op = build_sparse_many_body_op(L, N, J)
 
     # Diagonal terms.
@@ -89,4 +89,39 @@ end
     @test Op2[1, 1] ≈ 8.3
     @test Op2[4, 4] ≈ 18.3
     @test Op2[6, 6] ≈ 28.3
+end
+
+@testset "dense many-body operator with L spins s=1" begin
+    L = 4
+    Sz = 2
+    J = reshape(collect(1.:L^2), (L, L))
+    JmJp = collect(1.:L)/4
+    Jz = collect(1.:L)/2
+    Op = build_spin1_many_body_op(L, Sz, J, JmJp, Jz)
+
+    # Diagonal terms: S^z_i + S^+_i S^-_i + S^-_i S^+_i.
+    @test Op[1, 1] ≈ 1.5 + 68. + 3.5
+    @test Op[4, 4] ≈ 2.5 + 68. + 2.5
+    @test Op[7, 7] ≈ 4. + 66. + 0.5
+    @test Op[10, 10] ≈ 1. + 36. + 2.
+
+    # Off-diagonal terms.
+    @test Op[1, 2] ≈ 20.
+    @test Op[1, 4] ≈ 28.
+    @test Op[1, 6] ≈ 0.
+    @test Op[7, 6] ≈ 4.
+    @test Op[6, 7] ≈ 10.
+    @test Op[1, 9] ≈ 30.
+    @test Op[9, 1] ≈ 24.
+    @test Op[1, 10] ≈ 24.
+
+    L = 3
+    Sz = 0
+    J = reshape(collect(1.:L^2), (L, L))
+    JmJp = collect(1.:L)/4
+    Jz = collect(1.:L)/2
+    Op = build_spin1_many_body_op(L, Sz, J, JmJp, Jz)
+    # Off-diagonal terms.
+    @test Op[4, 2] ≈ 12.
+    @test Op[4, 5] ≈ 4.
 end
