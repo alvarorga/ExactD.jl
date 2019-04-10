@@ -125,3 +125,48 @@ end
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
 end
+
+@testset "type of many-body operators" begin
+    L = 4
+    N = 2
+    C = complex(1.)
+    J0::Array{ComplexF64, 2} = reshape(collect(1:L^2), (L, L))
+    Op = build_many_body_op(L, N, J0, C)
+    @test eltype(Op) == ComplexF64
+
+    L = 4
+    N = 2
+    C = 1.
+    J1::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
+    Op = build_many_body_op(L, N, J1, C)
+    @test eltype(Op) == Float64
+
+    L = 4
+    N = 2
+    C = 0.1
+    J2::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
+    Op = build_many_body_op(L, N, J2, C)
+    @test eltype(Op) == Float64
+
+    L = 4
+    N = 2
+    J3::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
+    Op = build_sparse_many_body_op(L, N, J3)
+    @test eltype(Op) == Float64
+
+    L = 3
+    Sz = 0
+    J4::Array{ComplexF64, 2} = reshape(collect(1:L^2), (L, L))
+    JmJp = complex.(collect(1.:L)/4)
+    Jz = complex.(collect(1.:L)/2)
+    Op = build_spin1_many_body_op(L, Sz, J4, JmJp, Jz)
+    @test eltype(Op) == ComplexF64
+
+    L = 3
+    Sz = 0
+    J5::Array{Float64, 2} = reshape(collect(1.:L^2), (L, L))
+    JmJp = collect(1.:L)/4
+    Jz = collect(1.:L)/2
+    Op = build_spin1_many_body_op(L, Sz, J5, JmJp, Jz)
+    @test eltype(Op) == Float64
+end

@@ -7,9 +7,7 @@ using SparseArrays
 include("./states.jl")
 
 """
-    build_many_body_op(L::Int, N::Int,
-                       J::Array{T, 2} where T=Union{Float64, ComplexF64},
-                       C::Union{Float64, ComplexF64}=0.)
+    function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
 
 Build many-body operator from the hopping matrix J.
 
@@ -18,18 +16,16 @@ Build many-body operator from the hopping matrix J.
 - `N::Int`: number of particles.
 - `J::Array{T, 2}`: hopping matrix:
     ``J = ∑_{ij} J_{i,j} b^†_i b_j``
-- `C::Union{Float64, ComplexF64}=0.`: constant term added to the
-    diagonal of the many-body operator.
+- `C::T=zero(T)`: constant term added to the diagonal of the many-body
+    operator.
 """
-function build_many_body_op(L::Int, N::Int,
-                            J::Array{T, 2} where T=Union{Float64, ComplexF64},
-                            C::Union{Float64, ComplexF64}=0.)
+function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
     states = _get_LN_states(L, N)
     dH = length(states)
 
     # Make the many-body operator of the same type as J.
-    Op = zeros(eltype(J), (dH, dH))
+    Op = zeros(T, (dH, dH))
 
     for s=1:dH
         state = states[s]
@@ -59,9 +55,7 @@ function build_many_body_op(L::Int, N::Int,
 end
 
 """
-    build_sparse_many_body_op(L::Int, N::Int,
-                              J::Array{T, 2} where T=Union{Float64, ComplexF64},
-                              C::Union{Float64, ComplexF64}=0.)
+    function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
 
 Build sparse many-body operator from the matrix J.
 
@@ -70,13 +64,10 @@ Build sparse many-body operator from the matrix J.
 - `N::Int`: number of particles.
 - `J::Array{T, 2}`: hopping matrix:
     ``J = ∑_{ij} J_{i,j} b^†_i b_j``
-- `C::Union{Float64, ComplexF64}=0.`: constant term added to the
-    diagonal of the many-body operator.
+- `C::T=zero(T)`: constant term added to the diagonal of the many-body
+    operator.
 """
-function build_sparse_many_body_op(L::Int, N::Int,
-                                   J::Array{T, 2} where T=Union{Float64,
-                                                                ComplexF64},
-                                   C::Union{Float64, ComplexF64}=0.)
+function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
     states = _get_LN_states(L, N)
     dH = length(states)
@@ -95,7 +86,8 @@ function build_sparse_many_body_op(L::Int, N::Int,
     nnz_in_Op = nnz_J*elts_correlator + dH
     rows = zeros(Int, nnz_in_Op)
     cols = zeros(Int, nnz_in_Op)
-    vals = zeros(eltype(J), nnz_in_Op)
+    vals_type = Float64
+    vals = zeros(T, nnz_in_Op)
 
     cont = 1
     for s=1:dH
@@ -133,11 +125,8 @@ function build_sparse_many_body_op(L::Int, N::Int,
 end
 
 """
-    build_spin1_many_body_op(L::Int, Sz::Int,
-                             J::Array{T1, 2} where T1=Union{Float64, ComplexF64},
-                             JmJp::Vector{T2} where T2=Union{Float64, ComplexF64},
-                             Jz::Vector{T3} where T3=Union{Float64, ComplexF64},
-                             C::Union{Float64, ComplexF64}=0.)
+    function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
+                                      JmJp::Vector{T}, Jz::Vector{T}, C::T=zero(T))
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
@@ -146,24 +135,21 @@ Build a spin 1 many-body operator from the hopping matrix J.
 - `Sz::Int`: magentization of the states.
 - `J::Array{T, 2}`: hopping matrix:
     ``J = ∑_{ij} J_{i,j} S^+_i S^-_j``
-- `JmJp::Array{T, 1}`: local terms:
+- `JmJp::Vector{T}`: local terms:
     ``JmpJp = ∑_i JmJp_i S^-_i S^+_i``
-- `Jz::Array{T, 1}`: local Sz terms:
+- `Jz::Vector{T}`: local Sz terms:
     ``Jz = ∑_i Jz_i S^z_i``
-- `C::Union{Float64, ComplexF64}=0.`: constant term added to the
-    diagonal of the many-body operator.
+- `C::T=zero(T)`: constant term added to the diagonal of the many-body
+    operator.
 """
-function build_spin1_many_body_op(L::Int, Sz::Int,
-                                  J::Array{T1, 2} where T1=Union{Float64, ComplexF64},
-                                  JmJp::Vector{T2} where T2=Union{Float64, ComplexF64},
-                                  Jz::Vector{T3} where T3=Union{Float64, ComplexF64},
-                                  C::Union{Float64, ComplexF64}=0.)
+function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
+                                  JmJp::Vector{T}, Jz::Vector{T}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
     states = _get_spin1_LSz_states(L, Sz)
     dH = length(states)
 
     # Make the many-body operator of the same type as J.
-    Op = zeros(eltype(J), (dH, dH))
+    Op = zeros(T, (dH, dH))
 
     for s=1:dH
         state = states[s]
