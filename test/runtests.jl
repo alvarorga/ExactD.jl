@@ -95,15 +95,16 @@ end
     L = 4
     Sz = 2
     J = reshape(collect(1.:L^2), (L, L))
-    JmJp = collect(1.:L)/4
     Jz = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J, JmJp, Jz)
+    Jz2 = collect(1.:L)/4
+    C = 1.33
+    Op = build_spin1_many_body_op(L, Sz, J, Jz, Jz2, C)
 
-    # Diagonal terms: S^z_i + S^+_i S^-_i + S^-_i S^+_i.
-    @test Op[1, 1] ≈ 1.5 + 68. + 3.5
-    @test Op[4, 4] ≈ 2.5 + 68. + 2.5
-    @test Op[7, 7] ≈ 4. + 66. + 0.5
-    @test Op[10, 10] ≈ 1. + 36. + 2.
+    # Diagonal terms: (S^z + S^z)^2.
+    @test Op[1, 1] ≈ 1.5 + 0.75 + C
+    @test Op[4, 4] ≈ 2.5 + 1.25 + C
+    @test Op[7, 7] ≈ 4. + 2.5 + C
+    @test Op[10, 10] ≈ 1. + 2.5 + C
 
     # Off-diagonal terms.
     @test Op[1, 2] ≈ 20.
@@ -118,9 +119,9 @@ end
     L = 3
     Sz = 0
     J = reshape(collect(1.:L^2), (L, L))
-    JmJp = collect(1.:L)/4
-    Jz = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J, JmJp, Jz)
+    Jz = collect(1.:L)/4
+    Jz2 = collect(1.:L)/2
+    Op = build_spin1_many_body_op(L, Sz, J, Jz, Jz2)
     # Off-diagonal terms.
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
@@ -157,16 +158,16 @@ end
     L = 3
     Sz = 0
     J4::Array{ComplexF64, 2} = reshape(collect(1:L^2), (L, L))
-    JmJp = complex.(collect(1.:L)/4)
+    Jz2 = complex.(collect(1.:L)/4)
     Jz = complex.(collect(1.:L)/2)
-    Op = build_spin1_many_body_op(L, Sz, J4, JmJp, Jz)
+    Op = build_spin1_many_body_op(L, Sz, J4, Jz, Jz2)
     @test eltype(Op) == ComplexF64
 
     L = 3
     Sz = 0
     J5::Array{Float64, 2} = reshape(collect(1.:L^2), (L, L))
-    JmJp = collect(1.:L)/4
+    Jz2 = collect(1.:L)/4
     Jz = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J5, JmJp, Jz)
+    Op = build_spin1_many_body_op(L, Sz, J5, Jz, Jz2)
     @test eltype(Op) == Float64
 end

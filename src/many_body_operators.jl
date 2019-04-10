@@ -126,24 +126,24 @@ end
 
 """
     function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
-                                      JmJp::Vector{T}, Jz::Vector{T}, C::T=zero(T))
+                                      Jz::Vector{T}, Jz2::Vector{T}, C::T=zero(T))
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
 # Arguments:
 - `L::Int`: number of sites.
 - `Sz::Int`: magentization of the states.
-- `J::Array{T, 2}`: hopping matrix:
+- `J::Array{T, 2}`: hopping matrix, ignore diagonal values:
     ``J = ∑_{ij} J_{i,j} S^+_i S^-_j``
-- `JmJp::Vector{T}`: local terms:
-    ``JmpJp = ∑_i JmJp_i S^-_i S^+_i``
 - `Jz::Vector{T}`: local Sz terms:
     ``Jz = ∑_i Jz_i S^z_i``
+- `Jz2::Vector{T}`: local Sz^2 terms:
+    ``Jz = ∑_i Jz2_i (S^z_i)^2``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
 function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
-                                  JmJp::Vector{T}, Jz::Vector{T}, C::T=zero(T)) where T
+                                  Jz::Vector{T}, Jz2::Vector{T}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
     states = _get_spin1_LSz_states(L, Sz)
     dH = length(states)
@@ -156,18 +156,13 @@ function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
         # Constant term.
         Op[s, s] += C
 
-        # Sz terms.
+        # Sz and Sz^2 terms.
         for i=0:L-1
             Op[s, s] += Jz[i+1]*((state>>(2i))&1 - (state>>(2i+1))&1)
+            Op[s, s] += Jz2[i+1]*((state>>(2i))&1 + (state>>(2i+1))&1)
         end
 
-        # S^+_i S^-_i and S^+_i S^-_i terms.
-        for i=0:L-1
-            Op[s, s] += 2*J[i+1, i+1]*(1 - (state>>(2i+1))&1)
-            Op[s, s] += 2*JmJp[i+1]*(1 - (state>>2i)&1)
-        end
-
-        # S^+_i S^-_j terms.
+        # S^+_i S^-_j, with i != j, terms.
         for i=0:L-1
             for j=0:L-1
                 i == j && continue
