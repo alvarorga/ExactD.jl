@@ -95,16 +95,16 @@ end
     L = 4
     Sz = 2
     J = reshape(collect(1.:L^2), (L, L))
+    W = reshape(collect(1.:L^2), (L, L))
     Jz = collect(1.:L)/2
-    Jz2 = collect(1.:L)/4
     C = 1.33
-    Op = build_spin1_many_body_op(L, Sz, J, Jz, Jz2, C)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz, C)
 
-    # Diagonal terms: (S^z + S^z)^2.
-    @test Op[1, 1] ≈ 1.5 + 0.75 + C
-    @test Op[4, 4] ≈ 2.5 + 1.25 + C
-    @test Op[7, 7] ≈ 4. + 2.5 + C
-    @test Op[10, 10] ≈ 1. + 2.5 + C
+    # Diagonal terms: S^z + (S^z_i)^2 + S^z_i*S^z_j.
+    @test Op[1, 1] ≈ 1.5 + 7 + 5 + C
+    @test Op[4, 4] ≈ 2.5 + 17 + 13 + C
+    @test Op[7, 7] ≈ 4. + 34 + 12 + C
+    @test Op[10, 10] ≈ 1. + 34 - 18 + C
 
     # Off-diagonal terms.
     @test Op[1, 2] ≈ 20.
@@ -119,9 +119,9 @@ end
     L = 3
     Sz = 0
     J = reshape(collect(1.:L^2), (L, L))
+    W = reshape(collect(1.:L^2), (L, L))
     Jz = collect(1.:L)/4
-    Jz2 = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J, Jz, Jz2)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
     # Off-diagonal terms.
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
@@ -131,43 +131,36 @@ end
     L = 4
     N = 2
     C = complex(1.)
-    J0::Array{ComplexF64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_many_body_op(L, N, J0, C)
+    J = complex.(reshape(collect(1.:L^2), (L, L)))
+    Op = build_many_body_op(L, N, J, C)
     @test eltype(Op) == ComplexF64
 
     L = 4
     N = 2
     C = 1.
-    J1::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_many_body_op(L, N, J1, C)
+    J = reshape(collect(1.:L^2), (L, L))
+    Op = build_many_body_op(L, N, J, C)
     @test eltype(Op) == Float64
 
     L = 4
     N = 2
-    C = 0.1
-    J2::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_many_body_op(L, N, J2, C)
-    @test eltype(Op) == Float64
-
-    L = 4
-    N = 2
-    J3::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_sparse_many_body_op(L, N, J3)
+    J = reshape(collect(1.:L^2), (L, L))
+    Op = build_sparse_many_body_op(L, N, J)
     @test eltype(Op) == Float64
 
     L = 3
     Sz = 0
-    J4::Array{ComplexF64, 2} = reshape(collect(1:L^2), (L, L))
-    Jz2 = complex.(collect(1.:L)/4)
+    J = complex.(reshape(collect(1.:L^2), (L, L)))
+    W = complex.(reshape(collect(1.:L^2), (L, L)))
     Jz = complex.(collect(1.:L)/2)
-    Op = build_spin1_many_body_op(L, Sz, J4, Jz, Jz2)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
     @test eltype(Op) == ComplexF64
 
     L = 3
     Sz = 0
-    J5::Array{Float64, 2} = reshape(collect(1.:L^2), (L, L))
-    Jz2 = collect(1.:L)/4
+    J = reshape(collect(1.:L^2), (L, L))
+    W = reshape(collect(1.:L^2), (L, L))
     Jz = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J5, Jz, Jz2)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
     @test eltype(Op) == Float64
 end

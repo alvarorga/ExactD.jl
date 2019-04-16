@@ -25,10 +25,10 @@ ExactD.jl can build many-body operators for hard-core boson  and spin-1 systems 
 
  This module also allows you to diagonalize spin-1 systems of the form
 
- ` H = C + \sum^L_{i=1} \left(Jz_i S^z_i + Jz2_i (S^z_i)^2 \right) + \sum^L_{i\neq j=1} J_{ij} S^+_i S^-_j `
+ ` H = C + \sum^L_{i=1} Jz_i S^z_i + \sum^L_{i\neq j=1} J_{ij} S^+_i S^-_j + \sum^L_{i\le j=1} W_{ij} S^z_i S^z_j`
 
  with the allowed states in each site of the system: `|1,+1>`, `|1,0>`, and `|1,-1>`. The function to build dense spin-1 many-body operators with magnetization `Sz` is
 
  ```julia
- build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2}, Jz::Vector{T}, Jz2::Vector{T}, C::T=zero(T))
+ build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2}, W::Array{T, 2}, Jz::Vector{T}, C::T=zero(T))
  ```

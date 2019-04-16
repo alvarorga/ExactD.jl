@@ -135,15 +135,15 @@ Build a spin 1 many-body operator from the hopping matrix J.
 - `Sz::Int`: magentization of the states.
 - `J::Array{T, 2}`: hopping matrix, ignore diagonal values:
     ``J = ∑_{ij} J_{i,j} S^+_i S^-_j``
+- `W::Array{T, 2}`: interaction matrix.
+    ``W = ∑_{i ≤ j} W_{i,j} S^z_i S^z_j``
 - `Jz::Vector{T}`: local Sz terms:
     ``Jz = ∑_i Jz_i S^z_i``
-- `Jz2::Vector{T}`: local Sz^2 terms:
-    ``Jz = ∑_i Jz2_i (S^z_i)^2``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
 function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
-                                  Jz::Vector{T}, Jz2::Vector{T}, C::T=zero(T)) where T
+                                  W::Array{T, 2}, Jz::Vector{T}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
     states = _get_spin1_LSz_states(L, Sz)
     dH = length(states)
@@ -158,8 +158,24 @@ function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
 
         # Sz and Sz^2 terms.
         for i=0:L-1
-            Op[s, s] += Jz[i+1]*((state>>(2i))&1 - (state>>(2i+1))&1)
-            Op[s, s] += Jz2[i+1]*((state>>(2i))&1 + (state>>(2i+1))&1)
+            Op[s, s] += Jz[i+1]*((state>>2i)&1 - (state>>(2i+1))&1)
+            Op[s, s] += W[i+1, i+1]*((state>>2i)&1 + (state>>(2i+1))&1)
+        end
+
+        # S^z_i S^z_j terms, i < j.
+        for j=1:L-1
+            for i=0:j-1
+                iszero(W[i+1, j+1]) && continue
+                # Four possibilities to find the state. In positions i and j,
+                # respectively: (+, +), (-, -), (-, +), (+, -).
+                if (((state>>2i)&3 == 1 && (state>>2j)&3 == 1) ||
+                    ((state>>2i)&3 == 2 && (state>>2j)&3 == 2))
+                    Op[s, s] += W[i+1, j+1]
+                elseif (((state>>2i)&3 == 2 && (state>>2j)&3 == 1) ||
+                        ((state>>2i)&3 == 1 && (state>>2j)&3 == 2))
+                    Op[s, s] -= W[i+1, j+1]
+                end
+            end
         end
 
         # S^+_i S^-_j, with i != j, terms.
