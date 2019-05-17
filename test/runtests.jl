@@ -23,6 +23,7 @@ end
     @test states[5] == 68
     @test states[7] == 86
     @test states[10] == 149
+    @test get_num_spin1_states(L, Sz) == 10
 
     L = 4
     Sz = 1
@@ -35,6 +36,7 @@ end
     @test states[8] == 70
     @test states[10] == 82
     @test states[16] == 148
+    @test get_num_spin1_states(L, Sz) == 16
 end
 
 @testset "dense many-body operator" begin

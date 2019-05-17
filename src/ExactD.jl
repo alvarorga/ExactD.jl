@@ -1,6 +1,8 @@
 module ExactD
 
-export build_many_body_op, build_sparse_many_body_op, build_spin1_many_body_op
+export
+    build_many_body_op, build_sparse_many_body_op, build_spin1_many_body_op,
+    get_num_spin1_states
 
 using SparseArrays
 

@@ -71,3 +71,12 @@ function get_spin1_LSz_states(L::Int, Sz::Int)
     end
     return states
 end
+
+"""
+    get_num_spin1_states(L::Int, Sz::Int)
+
+Compute the number of states with L sites and Sz magnetization.
+"""
+function get_num_spin1_states(L::Int, Sz::Int)
+    return length(get_spin1_LSz_states(L, Sz))
+end
