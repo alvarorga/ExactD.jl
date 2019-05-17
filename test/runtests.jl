@@ -4,7 +4,7 @@ using Test
 @testset "states with N particles and L sites" begin
     L = 4
     N = 2
-    states = ExactD._get_LN_states(L, N)
+    states = ExactD.get_LN_states(L, N)
 
     @test states[1] == 3
     @test states[3] == 6
@@ -15,7 +15,7 @@ end
 @testset "spin 1 states with L spins and Sz magnetization" begin
     L = 4
     Sz = 2
-    states = ExactD._get_spin1_LSz_states(L, Sz)
+    states = ExactD.get_spin1_LSz_states(L, Sz)
 
     @test length(states) == 10
     @test states[1] == 5
@@ -26,7 +26,7 @@ end
 
     L = 4
     Sz = 1
-    states = ExactD._get_spin1_LSz_states(L, Sz)
+    states = ExactD.get_spin1_LSz_states(L, Sz)
 
     @test length(states) == 16
     @test states[1] == 1

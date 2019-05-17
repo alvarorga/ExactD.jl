@@ -1,10 +1,6 @@
-"""
-Functions to build many-body operators.
-"""
-
-using SparseArrays
-
-include("./states.jl")
+#
+# Functions to build many-body operators.
+#
 
 """
     function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
@@ -21,7 +17,7 @@ Build many-body operator from the hopping matrix J.
 """
 function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
-    states = _get_LN_states(L, N)
+    states = get_LN_states(L, N)
     dH = length(states)
 
     # Make the many-body operator of the same type as J.
@@ -69,7 +65,7 @@ Build sparse many-body operator from the matrix J.
 """
 function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
-    states = _get_LN_states(L, N)
+    states = get_LN_states(L, N)
     dH = length(states)
 
     # Number of non-zero off-diagonal elts in J.
@@ -132,7 +128,7 @@ Build a spin 1 many-body operator from the hopping matrix J.
 
 # Arguments:
 - `L::Int`: number of sites.
-- `Sz::Int`: magentization of the states.
+- `Sz::Int`: magnetization of the states.
 - `J::Array{T, 2}`: hopping matrix, ignore diagonal values:
     ``J = ∑_{ij} J_{i,j} S^+_i S^-_j``
 - `W::Array{T, 2}`: interaction matrix.
@@ -145,7 +141,7 @@ Build a spin 1 many-body operator from the hopping matrix J.
 function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
                                   W::Array{T, 2}, Jz::Vector{T}, C::T=zero(T)) where T
     # Basis of states and dimension of the Hilbert space.
-    states = _get_spin1_LSz_states(L, Sz)
+    states = get_spin1_LSz_states(L, Sz)
     dH = length(states)
 
     # Make the many-body operator of the same type as J.

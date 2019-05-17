@@ -1,13 +1,13 @@
-"""
-Functions to compute Fock basis states.
-"""
+#
+# Functions to compute Fock basis states.
+#
 
 """
-    _get_LN_states(L::Int, N::Int)
+    get_LN_states(L::Int, N::Int)
 
 Compute fock basis states with L sites and N particles.
 """
-function _get_LN_states(L::Int, N::Int)
+function get_LN_states(L::Int, N::Int)
     states = zeros(Int, binomial(L, N))
     tmp = 1
     for i=0:(1<<L)-1
@@ -24,7 +24,7 @@ function _get_LN_states(L::Int, N::Int)
 end
 
 """
-    _get_spin1_LSz_states(L::Int, Sz::Int)
+    get_spin1_LSz_states(L::Int, Sz::Int)
 
 Compute states with L spins s=1 and Sz magnetization.
 
@@ -38,7 +38,7 @@ possible states:
 For example, a state with three spins, with magnetization -1, 1, 0 in
 each site, respectively, is represented as: 100100.
 """
-function _get_spin1_LSz_states(L::Int, Sz::Int)
+function get_spin1_LSz_states(L::Int, Sz::Int)
     # Number of states.
     num_states = 0
     l = iseven(L+Sz) ? L : L-1
