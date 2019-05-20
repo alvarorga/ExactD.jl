@@ -3,7 +3,7 @@
 #
 
 """
-    function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
+    function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J.
 
@@ -15,7 +15,7 @@ Build many-body operator from the hopping matrix J.
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
-function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
+function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
     # Basis of states and dimension of the Hilbert space.
     states = get_LN_states(L, N)
     dH = length(states)
@@ -51,7 +51,7 @@ function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where 
 end
 
 """
-    function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
+    function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
 
 Build sparse many-body operator from the matrix J.
 
@@ -63,7 +63,7 @@ Build sparse many-body operator from the matrix J.
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
-function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T
+function build_sparse_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
     # Basis of states and dimension of the Hilbert space.
     states = get_LN_states(L, N)
     dH = length(states)
@@ -123,6 +123,7 @@ end
 """
     function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
                                       Jz::Vector{T}, Jz2::Vector{T}, C::T=zero(T))
+                                      where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
@@ -139,7 +140,7 @@ Build a spin 1 many-body operator from the hopping matrix J.
     operator.
 """
 function build_spin1_many_body_op(L::Int, Sz::Int, J::Array{T, 2},
-                                  W::Array{T, 2}, Jz::Vector{T}, C::T=zero(T)) where T
+                                  W::Array{T, 2}, Jz::Vector{T}, C::T=zero(T)) where T<:Number
     # Basis of states and dimension of the Hilbert space.
     states = get_spin1_LSz_states(L, Sz)
     dH = length(states)
