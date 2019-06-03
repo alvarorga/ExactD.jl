@@ -8,14 +8,10 @@
 Compute fock basis states with L sites and N particles.
 """
 function get_LN_states(L::Int, N::Int)
-    states = zeros(Int, binomial(L, N))
+    states = Vector{Int}(undef, binomial(L, N))
     tmp = 1
     for i=0:(1<<L)-1
-        bits = 0
-        for j=0:L-1
-            bits += (i>>j)&1
-        end
-        if bits == N
+        if count_ones(i) == N
             states[tmp] = i
             tmp += 1
         end
