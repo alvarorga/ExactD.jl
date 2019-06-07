@@ -43,12 +43,13 @@ end
     L = 4
     N = 2
     J::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_many_body_op(L, N, J)
+    V::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
+    Op = build_many_body_op(L, N, J, V)
 
     # Diagonal terms.
-    @test Op[1, 1] ≈ 7.
-    @test Op[4, 4] ≈ 17.
-    @test Op[6, 6] ≈ 27.
+    @test Op[1, 1] ≈ 7. + 7.
+    @test Op[4, 4] ≈ 17. + 17.
+    @test Op[6, 6] ≈ 27. + 27.
 
     # Off-diagonal terms.
     @test Op[1, 2] ≈ 10.
@@ -58,12 +59,12 @@ end
     @test Op[3, 5] ≈ 15.
 
     C = 1.3
-    Op2 = build_many_body_op(L, N, J, C)
+    Op2 = build_many_body_op(L, N, J, V, C)
 
     # Diagonal terms.
-    @test Op2[1, 1] ≈ 8.3
-    @test Op2[4, 4] ≈ 18.3
-    @test Op2[6, 6] ≈ 28.3
+    @test Op2[1, 1] ≈ 8.3 + 7.
+    @test Op2[4, 4] ≈ 18.3 + 17.
+    @test Op2[6, 6] ≈ 28.3 + 27.
 end
 
 @testset "sparse many-body operator" begin
@@ -134,14 +135,16 @@ end
     N = 2
     C = complex(1.)
     J = complex.(reshape(collect(1.:L^2), (L, L)))
-    Op = build_many_body_op(L, N, J, C)
+    V = complex.(reshape(collect(1.:L^2), (L, L)))
+    Op = build_many_body_op(L, N, J, V, C)
     @test eltype(Op) == ComplexF64
 
     L = 4
     N = 2
     C = 1.
     J = reshape(collect(1.:L^2), (L, L))
-    Op = build_many_body_op(L, N, J, C)
+    V = reshape(collect(1.:L^2), (L, L))
+    Op = build_many_body_op(L, N, J, V, C)
     @test eltype(Op) == Float64
 
     L = 4

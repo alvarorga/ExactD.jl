@@ -12,13 +12,22 @@ Build many-body operator from the hopping matrix J.
 - `N::Int`: number of particles.
 - `J::Array{T, 2}`: hopping matrix:
     ``J = ∑_{ij} J_{i,j} b^†_i b_j``
+- `V::Array{T, 2}`: interaction matrix:
+    ``V = ∑_{ij} V_{i,j} n_i n_j``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
-function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
+function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, V::Array{T, 2},
+                            C::T=zero(T)) where T<:Number
     # Basis of states and dimension of the Hilbert space.
     states = get_LN_states(L, N)
     dH = length(states)
+
+    # Use only upper triangular part of `V`.
+    V = deepcopy(V)
+    for i=1:L-1, j=i+1:L
+        V[i, j] += V[j, i]
+    end
 
     # Make the many-body operator of the same type as J.
     Op = zeros(T, (dH, dH))
@@ -32,6 +41,11 @@ function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where 
         for i=0:L-1
             if (state>>i)&1 == 1
                 Op[s, s] += J[i+1, i+1]
+            end
+            for j=i+1:L-1
+                if !iszero(V[i+1, j+1]) && (state>>i)&1==1 && (state>>j)&1==1
+                    Op[s, s] += V[i+1, j+1]
+                end
             end
         end
 
