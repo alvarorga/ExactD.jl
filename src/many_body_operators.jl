@@ -3,11 +3,14 @@
 #
 
 """
-    function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, C::T=zero(T)) where T<:Number
+    function build_many_body_op(L::Int, N::Int,
+                                J::AbstractMatrix{T}, V::AbstractMatrix{T},
+                                C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with N particles.
 """
-function build_many_body_op(L::Int, N::Int, J::Array{T, 2}, V::Array{T, 2},
+function build_many_body_op(L::Int, N::Int,
+                            J::AbstractMatrix{T}, V::AbstractMatrix{T},
                             C::T=zero(T)) where T<:Number
     states = get_LN_states(L, N)
     return build_many_body_op(L, states, J, V, C)
@@ -15,7 +18,7 @@ end
 
 """
     function build_many_body_op(L::Int, states::Vector{Int},
-                                J::Array{T, 2}, V::Array{T, 2},
+                                J::AbstractMatrix{T}, V::AbstractMatrix{T},
                                 C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with a given basis of states.
@@ -23,15 +26,13 @@ Build many-body operator from the hopping matrix J with a given basis of states.
 # Arguments:
 - `L::Int`: number of sites.
 - `states::Vector{Int}`: basis of Fock states for the mb operator.
-- `J::Array{T, 2}`: hopping matrix:
-    ``J = ∑_{ij} J_{i,j} b^†_i b_j``
-- `V::Array{T, 2}`: interaction matrix:
-    ``V = ∑_{ij} V_{i,j} n_i n_j``
+- `J::AbstractMatrix{T}`: hopping matrix ``b^†_i b_j``
+- `V::AbstractMatrix{T}`: interaction matrix ``n_i n_j``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
 function build_many_body_op(L::Int, states::Vector{Int},
-                            J::Array{T, 2}, V::Array{T, 2},
+                            J::AbstractMatrix{T}, V::AbstractMatrix{T},
                             C::T=zero(T)) where T<:Number
     # Dimension of the Hilbert space.
     dH = length(states)
@@ -79,20 +80,21 @@ end
 
 """
     function build_sparse_many_body_op(L::Int, N::Int,
-                                       J::Array{T, 2}, C::T=zero(T)) where T<:Number
+                                       J::AbstractMatrix{T},
+                                       C::T=zero(T)) where T<:Number
 
 Build sparse many-body operator from the matrix J with a N particles.
 
 # Arguments:
 - `L::Int`: number of sites.
 - `N::Int`: number of particles.
-- `J::Array{T, 2}`: hopping matrix:
-    ``J = ∑_{ij} J_{i,j} b^†_i b_j``
+- `J::AbstractMatrix{T}`: hopping matrix ``b^†_i b_j``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
 function build_sparse_many_body_op(L::Int, N::Int,
-                                   J::Array{T, 2}, C::T=zero(T)) where T<:Number
+                                   J::AbstractMatrix{T},
+                                   C::T=zero(T)) where T<:Number
     # Basis of states and dimension of the Hilbert space.
     states = get_LN_states(L, N)
     dH = length(states)
@@ -151,40 +153,37 @@ end
 
 """
     function build_spin1_many_body_op(L::Int, Sz::Int,
-                                      J::Array{T, 2}, W::Array{T, 2}, Jz::Vector{T},
-                                      C::T=zero(T)) where T<:Number
+                                      J::AbstractMatrix{T}, W::AbstractMatrix{T},
+                                      Jz::Vector{T}, C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 """
 function build_spin1_many_body_op(L::Int, Sz::Int,
-                                  J::Array{T, 2}, W::Array{T, 2}, Jz::Vector{T},
-                                  C::T=zero(T)) where T<:Number
+                                  J::AbstractMatrix{T}, W::AbstractMatrix{T},
+                                  Jz::Vector{T}, C::T=zero(T)) where T<:Number
     states = get_spin1_LSz_states(L, Sz)
     return build_spin1_many_body_op(L, states, J, W, Jz, C)
 end
 
 """
     function build_spin1_many_body_op(L::Int, states::Vector{Int},
-                                      J::Array{T, 2}, W::Array{T, 2}, Jz::Vector{T},
-                                      C::T=zero(T)) where T<:Number
+                                      J::AbstractMatrix{T}, W::AbstractMatrix{T},
+                                      Jz::Vector{T}, C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
 # Arguments:
 - `L::Int`: number of sites.
 - `Sz::Int`: magnetization of the states.
-- `J::Array{T, 2}`: hopping matrix, ignore diagonal values:
-    ``J = ∑_{ij} J_{i,j} S^+_i S^-_j``
-- `W::Array{T, 2}`: interaction matrix.
-    ``W = ∑_{i ≤ j} W_{i,j} S^z_i S^z_j``
-- `Jz::Vector{T}`: local Sz terms:
-    ``Jz = ∑_i Jz_i S^z_i``
+- `J::AbstractMatrix{T}`: hopping matrix, ignore diagonal values ``S^+_i S^-_j``.
+- `W::AbstractMatrix{T}`: interaction matrix ``S^z_i S^z_j``.
+- `Jz::Vector{T}`: local Sz terms ``S^z_i``.
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
 function build_spin1_many_body_op(L::Int, states::Vector{Int},
-                                  J::Array{T, 2}, W::Array{T, 2}, Jz::Vector{T},
-                                  C::T=zero(T)) where T<:Number
+                                  J::AbstractMatrix{T}, W::AbstractMatrix{T},
+                                  Jz::Vector{T}, C::T=zero(T)) where T<:Number
     # Dimension of the Hilbert space.
     dH = length(states)
 
