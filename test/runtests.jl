@@ -1,6 +1,13 @@
 using ExactD
 using Test
 
+@testset "parity operator" begin
+    @test ExactD.parity(10, 1, 2) == 1.
+    @test ExactD.parity(10, 2, 0) == -1.
+    @test ExactD.parity(10, 1, 3) == 1.
+    @test ExactD.parity(14, 1, 3) == -1.
+end
+
 @testset "basis of Fock states" begin
 @testset "states with N particles and L sites" begin
     L = 4
