@@ -1,6 +1,7 @@
 using ExactD
 using Test
 
+@testset "basis of Fock states" begin
 @testset "states with N particles and L sites" begin
     L = 4
     N = 2
@@ -38,7 +39,9 @@ end
     @test states[16] == 148
     @test get_num_spin1_states(L, Sz) == 16
 end
+end  # testset "basis of Fock states"
 
+@testset "hard-core boson many body operators" begin
 @testset "dense many-body operator" begin
     L = 4
     N = 2
@@ -93,6 +96,7 @@ end
     @test Op2[4, 4] ≈ 18.3
     @test Op2[6, 6] ≈ 28.3
 end
+end  # testset "hard-core boson many body operators"
 
 @testset "dense many-body operator with L spins s=1" begin
     L = 4
@@ -128,44 +132,4 @@ end
     # Off-diagonal terms.
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
-end
-
-@testset "type of many-body operators" begin
-    L = 4
-    N = 2
-    C = complex(1.)
-    J = complex.(reshape(collect(1.:L^2), (L, L)))
-    V = complex.(reshape(collect(1.:L^2), (L, L)))
-    Op = build_many_body_op(L, N, J, V, C)
-    @test eltype(Op) == ComplexF64
-
-    L = 4
-    N = 2
-    C = 1.
-    J = reshape(collect(1.:L^2), (L, L))
-    V = reshape(collect(1.:L^2), (L, L))
-    Op = build_many_body_op(L, N, J, V, C)
-    @test eltype(Op) == Float64
-
-    L = 4
-    N = 2
-    J = reshape(collect(1.:L^2), (L, L))
-    Op = build_sparse_many_body_op(L, N, J)
-    @test eltype(Op) == Float64
-
-    L = 3
-    Sz = 0
-    J = complex.(reshape(collect(1.:L^2), (L, L)))
-    W = complex.(reshape(collect(1.:L^2), (L, L)))
-    Jz = complex.(collect(1.:L)/2)
-    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
-    @test eltype(Op) == ComplexF64
-
-    L = 3
-    Sz = 0
-    J = reshape(collect(1.:L^2), (L, L))
-    W = reshape(collect(1.:L^2), (L, L))
-    Jz = collect(1.:L)/2
-    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
-    @test eltype(Op) == Float64
 end
