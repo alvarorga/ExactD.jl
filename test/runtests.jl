@@ -20,6 +20,20 @@ end
     @test states[6] == 12
 end
 
+@testset "states with N1, N2 particles and L sites" begin
+    L = 4
+    N1 = 2
+    N2 = 3
+    states = ExactD.get_LN1N2_states(L, N1, N2)
+
+    @test states[1] == 16+32+64 + 1+2
+    @test states[5] == 16+32+64 + 2+8
+    @test states[9] == 16+32+128 + 2+4
+    @test states[11] == 16+32+128 + 2+8
+    @test states[18] == 16+64+128 + 4+8
+    @test states[23] == 32+64+128 + 2+8
+end
+
 @testset "spin 1 states with L spins and Sz magnetization" begin
     L = 4
     Sz = 2

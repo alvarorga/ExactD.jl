@@ -2,7 +2,8 @@ module ExactD
 
 export
     build_many_body_op, build_sparse_many_body_op, build_spin1_many_body_op,
-    get_num_spin1_states, get_entanglement_entropy
+    get_num_spin1_states, get_LN_states, get_LN1N2_states,
+    get_entanglement_entropy
 
 using SparseArrays, LinearAlgebra
 

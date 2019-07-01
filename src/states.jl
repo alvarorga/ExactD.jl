@@ -5,13 +5,33 @@
 """
     get_LN_states(L::Int, N::Int)
 
-Compute fock basis states with L sites and N particles.
+Compute Fock basis states with L sites and N particles.
 """
 function get_LN_states(L::Int, N::Int)
     states = Vector{Int}(undef, binomial(L, N))
     tmp = 1
     for i=0:(1<<L)-1
         if count_ones(i) == N
+            states[tmp] = i
+            tmp += 1
+        end
+    end
+    return states
+end
+
+"""
+    get_LN1N2_states(L::Int, N1::Int, N2::Int)
+
+Compute Fock basis states with L sites, N1 particles of type 1 and N2 particles
+of type 2 (e.g. spin up and spin down).
+"""
+function get_LN1N2_states(L::Int, N1::Int, N2::Int)
+    states = Vector{Int}(undef, binomial(L, N1)*binomial(L, N2))
+    tmp = 1
+    mask1 = 1<<L - 1
+    mask2 = 1<<(2L) - 1 - mask1
+    for i=0:(1<<(2L))-1
+        if count_ones(i&mask1) == N1 && count_ones(i&mask2) == N2
             states[tmp] = i
             tmp += 1
         end
