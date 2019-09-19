@@ -162,9 +162,9 @@ end
     s = rand(length(basis))
     s ./= norm(s)
 
-    p = [1]
+    p = 1
     @test expected_n(basis, s, p) ≈ s[1]^2+s[2]^2+s[3]^2+s[5]^2+s[6]^2+s[8]^2
-    p = [4]
+    p = 4
     @test expected_n(basis, s, p) ≈ s[2]^2+s[3]^2+s[4]^2+s[8]^2+s[9]^2+s[10]^2
 
     p = [1, 3]

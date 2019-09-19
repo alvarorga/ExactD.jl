@@ -21,3 +21,5 @@ function expected_n(basis::Vector{Int},
     end
     return o
 end
+
+expected_n(basis, state, p::Int) = expected_n(basis, state, Int[p])
