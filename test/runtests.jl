@@ -180,4 +180,26 @@ end
     p = [1, 2, 3, 5]
     @test expected_n(basis, s, p) ≈ 0. atol=1e-10
 end
+
+@testset "<b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]>" begin
+    L = 5
+    N = 3
+    basis = get_LN_states(L, N)
+    s = rand(length(basis))
+    s ./= norm(s)
+
+    p = 1
+    q = 1
+    @test expected_pq(basis, s, p, q) ≈ s[1]^2+s[2]^2+s[3]^2+s[5]^2+s[6]^2+s[8]^2
+    p = 4
+    q = 4
+    @test expected_pq(basis, s, p, q) ≈ s[2]^2+s[3]^2+s[4]^2+s[8]^2+s[9]^2+s[10]^2
+
+    p = [1, 2]
+    q = [1, 3]
+    @test expected_pq(basis, s, p, q) ≈ s[2]*s[3] + s[5]*s[6]
+    p = [4, 2]
+    q = [1, 3]
+    @test expected_pq(basis, s, p, q) ≈ s[6]*s[9]
+end
 end
