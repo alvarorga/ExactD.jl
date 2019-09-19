@@ -1,5 +1,4 @@
-using ExactD
-using Test
+using ExactD, Random, LinearAlgebra, Test
 
 @testset "parity operator" begin
     @test ExactD.parity(10, 1, 2) == 1.
@@ -153,4 +152,32 @@ end  # testset "hard-core boson many body operators"
     # Off-diagonal terms.
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
+end
+
+@testset "expectation values" begin
+@testset "<n_p1*n_p2*...*n_pn>" begin
+    L = 5
+    N = 3
+    basis = get_LN_states(L, N)
+    s = rand(length(basis))
+    s ./= norm(s)
+
+    p = [1]
+    @test expected_n(basis, s, p) ≈ s[1]^2+s[2]^2+s[3]^2+s[5]^2+s[6]^2+s[8]^2
+    p = [4]
+    @test expected_n(basis, s, p) ≈ s[2]^2+s[3]^2+s[4]^2+s[8]^2+s[9]^2+s[10]^2
+
+    p = [1, 3]
+    @test expected_n(basis, s, p) ≈ s[1]^2+s[3]^2+s[6]^2
+    p = [4, 2]
+    @test expected_n(basis, s, p) ≈ s[2]^2+s[4]^2+s[9]^2
+
+    p = [1, 3, 5]
+    @test expected_n(basis, s, p) ≈ s[6]^2
+    p = [4, 2, 3]
+    @test expected_n(basis, s, p) ≈ s[4]^2
+
+    p = [1, 2, 3, 5]
+    @test expected_n(basis, s, p) ≈ 0. atol=1e-10
+end
 end
