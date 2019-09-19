@@ -1,6 +1,4 @@
-#
-# Functions to compute Schmidt decomposition and entanglement entropy.
-#
+export get_entanglement_entropy
 
 """
     do_schmidt_decomposition(L::Int, N::Int, i::Int,

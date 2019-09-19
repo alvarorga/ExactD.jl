@@ -1,6 +1,6 @@
-#
-# Functions to build many-body operators.
-#
+export build_many_body_op,
+       build_sparse_many_body_op,
+       build_spin1_many_body_op
 
 """
     function build_many_body_op(L::Int, N::Int,

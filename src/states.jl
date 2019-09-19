@@ -1,6 +1,6 @@
-#
-# Functions to compute Fock basis states.
-#
+export get_LN_states,
+       get_LN1N2_states,
+       get_num_spin1_states
 
 """
     get_LN_states(L::Int, N::Int)
