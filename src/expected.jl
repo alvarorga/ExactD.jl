@@ -26,9 +26,10 @@ end
 expected_n(basis, state, p::Int) = expected_n(basis, state, Int[p])
 
 """
-    expected_n(basis::Vector{Int},
-               state::Vector{<:Number},
-               p::Vector{Int})
+    expected_pq(basis::Vector{Int},
+                state::Vector{<:Number},
+                p::Vector{Int},
+                q::Vector{Int})
 
 Compute <state|b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]|state>.
 """
