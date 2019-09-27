@@ -4,38 +4,43 @@ export build_many_body_op,
 
 """
     function build_many_body_op(L::Int, N::Int,
-                                J::AbstractMatrix{T}, V::AbstractMatrix{T},
+                                J::AbstractMatrix{T},
+                                V::AbstractMatrix{T},
                                 C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with N particles.
 """
 function build_many_body_op(L::Int, N::Int,
-                            J::AbstractMatrix{T}, V::AbstractMatrix{T},
+                            J::AbstractMatrix{T},
+                            V::AbstractMatrix{T},
                             C::T=zero(T)) where T<:Number
-    states = get_LN_states(L, N)
-    return build_many_body_op(L, states, J, V, C)
+    basis = make_LN_basis(L, N)
+    return build_many_body_op(L, basis, J, V, C)
 end
 
 """
-    function build_many_body_op(L::Int, states::Vector{Int},
-                                J::AbstractMatrix{T}, V::AbstractMatrix{T},
+    function build_many_body_op(L::Int,
+                                basis::Vector{Int},
+                                J::AbstractMatrix{T},
+                                V::AbstractMatrix{T},
                                 C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with a given basis of states.
 
 # Arguments:
-- `L::Int`: number of sites.
-- `states::Vector{Int}`: basis of Fock states for the mb operator.
-- `J::AbstractMatrix{T}`: hopping matrix ``b^†_i b_j``
-- `V::AbstractMatrix{T}`: interaction matrix ``n_i n_j``
-- `C::T=zero(T)`: constant term added to the diagonal of the many-body
-    operator.
+- L::Int: number of sites.
+- basis::Vector{Int}: basis of Fock states for the mb operator.
+- J::AbstractMatrix{T}: hopping matrix b^dagger_i*b_j.
+- V::AbstractMatrix{T}: interaction matrix n_i*n_j.
+- C::T=zero(T): constant term.
 """
-function build_many_body_op(L::Int, states::Vector{Int},
-                            J::AbstractMatrix{T}, V::AbstractMatrix{T},
+function build_many_body_op(L::Int,
+                            basis::Vector{Int},
+                            J::AbstractMatrix{T},
+                            V::AbstractMatrix{T},
                             C::T=zero(T)) where T<:Number
     # Dimension of the Hilbert space.
-    dH = length(states)
+    dH = length(basis)
 
     # Use only upper triangular part of `V`.
     V = deepcopy(V)
@@ -47,7 +52,7 @@ function build_many_body_op(L::Int, states::Vector{Int},
     Op = zeros(T, (dH, dH))
 
     for s=1:dH
-        state = states[s]
+        state = basis[s]
         # Constant term.
         Op[s, s] += C
 
@@ -69,7 +74,7 @@ function build_many_body_op(L::Int, states::Vector{Int},
                 if (!iszero(J[i+1, j+1])
                         && (state>>i)&1 == 0 && (state>>j)&1 == 1)
                     Jstate = state + 1<<i - 1<<j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     Op[js, s] = J[i+1, j+1]
                 end
             end
@@ -80,7 +85,7 @@ end
 
 """
     function build_sparse_many_body_op(L::Int,
-                                       states::Vector{Int},
+                                       basis::Vector{Int},
                                        J::AbstractMatrix{T},
                                        V::AbstractMatrix{T},
                                        C::T=zero(T)) where {T<:Number}
@@ -88,20 +93,19 @@ end
 Build sparse many-body operator from the matrix J with a N particles.
 
 # Arguments:
-- `L::Int`: number of sites.
-- `states::Vector{Int}`: basis of Fock states for the mb operator.
-- `J::AbstractMatrix{T}`: hopping matrix ``b^†_i b_j``
-- `V::AbstractMatrix{T}`: interaction matrix ``n_i n_j``
-- `C::T=zero(T)`: constant term added to the diagonal of the many-body
-    operator.
+- L::Int: number of sites.
+- basis::Vector{Int}: basis of Fock states for the mb operator.
+- J::AbstractMatrix{T}: hopping matrix b^dagger_i*b_j.
+- V::AbstractMatrix{T}: interaction matrix n_i*n_j.
+- C::T=zero(T): constant term.
 """
 function build_sparse_many_body_op(L::Int,
-                                   states::Vector{Int},
+                                   basis::Vector{Int},
                                    J::AbstractMatrix{T},
                                    V::AbstractMatrix{T},
                                    C::T=zero(T)) where {T<:Number}
     # Dimension of the Hilbert space.
-    dH = length(states)
+    dH = length(basis)
 
     # Use only upper triangular part of `V`.
     V = deepcopy(V)
@@ -119,7 +123,7 @@ function build_sparse_many_body_op(L::Int,
 
     cont = 1
     for s=1:dH
-        state = states[s]
+        state = basis[s]
         # Constant term.
         vals[cont] += C
 
@@ -144,7 +148,7 @@ function build_sparse_many_body_op(L::Int,
                 if (!iszero(J[i+1, j+1])
                         && (state>>i)&1 == 0 && (state>>j)&1 == 1)
                     Jstate = state + 1<<i - 1<<j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     rows[cont] = js
                     cols[cont] = s
                     vals[cont] = J[i+1, j+1]
@@ -162,46 +166,57 @@ function build_sparse_many_body_op(L::Int,
 end
 
 """
-    function build_spin1_many_body_op(L::Int, Sz::Int,
-                                      J::AbstractMatrix{T}, W::AbstractMatrix{T},
-                                      Jz::Vector{T}, C::T=zero(T)) where T<:Number
+    function build_spin1_many_body_op(L::Int,
+                                      Sz::Int,
+                                      J::AbstractMatrix{T},
+                                      W::AbstractMatrix{T},
+                                      Jz::Vector{T},
+                                      C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 """
-function build_spin1_many_body_op(L::Int, Sz::Int,
-                                  J::AbstractMatrix{T}, W::AbstractMatrix{T},
-                                  Jz::Vector{T}, C::T=zero(T)) where T<:Number
-    states = get_spin1_LSz_states(L, Sz)
-    return build_spin1_many_body_op(L, states, J, W, Jz, C)
+function build_spin1_many_body_op(L::Int,
+                                  Sz::Int,
+                                  J::AbstractMatrix{T},
+                                  W::AbstractMatrix{T},
+                                  Jz::Vector{T},
+                                  C::T=zero(T)) where T<:Number
+    basis = make_spin1_LSz_basis(L, Sz)
+    return build_spin1_many_body_op(L, basis, J, W, Jz, C)
 end
 
 """
-    function build_spin1_many_body_op(L::Int, states::Vector{Int},
-                                      J::AbstractMatrix{T}, W::AbstractMatrix{T},
-                                      Jz::Vector{T}, C::T=zero(T)) where T<:Number
+    function build_spin1_many_body_op(L::Int,
+                                      basis::Vector{Int},
+                                      J::AbstractMatrix{T},
+                                      W::AbstractMatrix{T},
+                                      Jz::Vector{T},
+                                      C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
 # Arguments:
-- `L::Int`: number of sites.
-- `Sz::Int`: magnetization of the states.
-- `J::AbstractMatrix{T}`: hopping matrix, ignore diagonal values ``S^+_i S^-_j``.
-- `W::AbstractMatrix{T}`: interaction matrix ``S^z_i S^z_j``.
-- `Jz::Vector{T}`: local Sz terms ``S^z_i``.
-- `C::T=zero(T)`: constant term added to the diagonal of the many-body
-    operator.
+- L::Int: number of sites.
+- Sz::Int: magnetization of the basis.
+- J::AbstractMatrix{T}: hopping matrix, ignore diagonal values S^+_i*S^-_j.
+- W::AbstractMatrix{T}: interaction matrix S^z_i*S^z_j.
+- Jz::Vector{T}: local Sz terms S^z_i.
+- C::T=zero(T): constant term.
 """
-function build_spin1_many_body_op(L::Int, states::Vector{Int},
-                                  J::AbstractMatrix{T}, W::AbstractMatrix{T},
-                                  Jz::Vector{T}, C::T=zero(T)) where T<:Number
+function build_spin1_many_body_op(L::Int,
+                                  basis::Vector{Int},
+                                  J::AbstractMatrix{T},
+                                  W::AbstractMatrix{T},
+                                  Jz::Vector{T},
+                                  C::T=zero(T)) where T<:Number
     # Dimension of the Hilbert space.
-    dH = length(states)
+    dH = length(basis)
 
     # Make the many-body operator of the same type as J.
     Op = zeros(T, (dH, dH))
 
     for s=1:dH
-        state = states[s]
+        state = basis[s]
         # Constant term.
         Op[s, s] += C
 
@@ -236,19 +251,19 @@ function build_spin1_many_body_op(L::Int, states::Vector{Int},
                 # respectively: (0, +), (0, 0), (-, +), (-, 0).
                 if (state>>2i)&3 == 0 && (state>>2j)&3 == 1
                     Jstate = state + 1<<2i - 1<<2j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     Op[js, s] = 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 0 && (state>>2j)&3 == 0
                     Jstate = state + 1<<2i + 2<<2j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     Op[js, s] = 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 2 && (state>>2j)&3 == 1
                     Jstate = state - 2<<2i - 1<<2j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     Op[js, s] = 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 2 && (state>>2j)&3 == 0
                     Jstate = state - 2<<2i + 2<<2j
-                    js = searchsortedfirst(states, Jstate)
+                    js = searchsortedfirst(basis, Jstate)
                     Op[js, s] = 2*J[i+1, j+1]
                 end
             end

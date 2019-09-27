@@ -11,7 +11,7 @@ end
 @testset "states with N particles and L sites" begin
     L = 4
     N = 2
-    states = ExactD.get_LN_states(L, N)
+    states = make_LN_basis(L, N)
 
     @test states[1] == 3
     @test states[3] == 6
@@ -23,7 +23,7 @@ end
     L = 4
     N1 = 2
     N2 = 3
-    states = ExactD.get_LN1N2_states(L, N1, N2)
+    states = make_LN1N2_basis(L, N1, N2)
 
     @test states[1] == 16+32+64 + 1+2
     @test states[5] == 16+32+64 + 2+8
@@ -36,7 +36,7 @@ end
 @testset "spin 1 states with L spins and Sz magnetization" begin
     L = 4
     Sz = 2
-    states = ExactD.get_spin1_LSz_states(L, Sz)
+    states = make_spin1_LSz_basis(L, Sz)
 
     @test length(states) == 10
     @test states[1] == 5
@@ -48,7 +48,7 @@ end
 
     L = 4
     Sz = 1
-    states = ExactD.get_spin1_LSz_states(L, Sz)
+    states = make_spin1_LSz_basis(L, Sz)
 
     @test length(states) == 16
     @test states[1] == 1
@@ -93,7 +93,7 @@ end
 @testset "sparse many-body operator" begin
     L = 6
     N = 3
-    basis = get_LN_states(L, N)
+    basis = make_LN_basis(L, N)
     J::Array{Float64, 2} = reshape(sin.(1:L^2), (L, L))
     V::Array{Float64, 2} = reshape(tan.(1:L^2), (L, L))
     C = 1.3
@@ -143,7 +143,7 @@ end
 @testset "<n_p1*n_p2*...*n_pn>" begin
     L = 5
     N = 3
-    basis = get_LN_states(L, N)
+    basis = make_LN_basis(L, N)
     s = rand(length(basis))
     s ./= norm(s)
 
@@ -169,7 +169,7 @@ end
 @testset "<b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]>" begin
     L = 5
     N = 3
-    basis = get_LN_states(L, N)
+    basis = make_LN_basis(L, N)
     s = rand(length(basis))
     s ./= norm(s)
 

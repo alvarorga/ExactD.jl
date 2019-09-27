@@ -1,25 +1,33 @@
 export get_entanglement_entropy
 
 """
-    do_schmidt_decomposition(L::Int, N::Int, i::Int,
+    do_schmidt_decomposition(L::Int,
+                             N::Int,
+                             i::Int,
                              state::Vector{<:Number})
 
 Do Schmidt decomposition of `state` at site `i`.
 """
-function do_schmidt_decomposition(L::Int, N::Int, i::Int,
+function do_schmidt_decomposition(L::Int,
+                                  N::Int,
+                                  i::Int,
                                   state::Vector{<:Number})
     # Get basis of states.
-    basis = get_LN_states(L, N)
+    basis = make_LN_basis(L, N)
     return do_schmidt_decomposition(L, i, basis, state)
 end
 
 """
-    do_schmidt_decomposition(L::Int, i::Int, basis::Vector{Int},
+    do_schmidt_decomposition(L::Int,
+                             i::Int,
+                             basis::Vector{Int},
                              state::Vector{<:Number})
 
 Do Schmidt decomposition of `state` at site `i`.
 """
-function do_schmidt_decomposition(L::Int, i::Int, basis::Vector{Int},
+function do_schmidt_decomposition(L::Int,
+                                  i::Int,
+                                  basis::Vector{Int},
                                   state::Vector{<:Number})
     # Matrix to store the decomposed state in the A and B subspaces.
     dim_A = 1<<(L-i)
@@ -39,25 +47,33 @@ function do_schmidt_decomposition(L::Int, i::Int, basis::Vector{Int},
 end
 
 """
-    get_entanglement_entropy(L::Int, N::Int, i::Int,
+    get_entanglement_entropy(L::Int,
+                             N::Int,
+                             i::Int,
                              state::Vector{<:Number})
 
 Compute the entanglement entropy of `state` at site `i`.
 """
-function get_entanglement_entropy(L::Int, N::Int, i::Int,
+function get_entanglement_entropy(L::Int,
+                                  N::Int,
+                                  i::Int,
                                   state::Vector{<:Number})
     # Get basis of states.
-    basis = get_LN_states(L, N)
+    basis = make_LN_basis(L, N)
     return get_entanglement_entropy(L, i, basis, state)
 end
 
 """
-    get_entanglement_entropy(L::Int, i::Int, basis::Vector{Int},
+    get_entanglement_entropy(L::Int,
+                             i::Int,
+                             basis::Vector{Int},
                              state::Vector{<:Number})
 
 Compute the entanglement entropy of `state` at site `i`.
 """
-function get_entanglement_entropy(L::Int, i::Int, basis::Vector{Int},
+function get_entanglement_entropy(L::Int,
+                                  i::Int,
+                                  basis::Vector{Int},
                                   state::Vector{<:Number})
     svals = do_schmidt_decomposition(L, i, basis, state)
     svals2 = svals.^2

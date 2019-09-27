@@ -1,13 +1,14 @@
-export get_LN_states,
-       get_LN1N2_states,
+export make_LN_basis,
+       make_LN1N2_basis,
+       make_spin1_LSz_basis,
        get_num_spin1_states
 
 """
-    get_LN_states(L::Int, N::Int)
+    make_LN_basis(L::Int, N::Int)
 
 Compute Fock basis states with L sites and N particles.
 """
-function get_LN_states(L::Int, N::Int)
+function make_LN_basis(L::Int, N::Int)
     states = Vector{Int}(undef, binomial(L, N))
     tmp = 1
     for i=0:(1<<L)-1
@@ -20,12 +21,12 @@ function get_LN_states(L::Int, N::Int)
 end
 
 """
-    get_LN1N2_states(L::Int, N1::Int, N2::Int)
+    make_LN1N2_basis(L::Int, N1::Int, N2::Int)
 
 Compute Fock basis states with L sites, N1 particles of type 1 and N2 particles
 of type 2 (e.g. spin up and spin down).
 """
-function get_LN1N2_states(L::Int, N1::Int, N2::Int)
+function make_LN1N2_basis(L::Int, N1::Int, N2::Int)
     states = Vector{Int}(undef, binomial(L, N1)*binomial(L, N2))
     tmp = 1
     mask1 = 1<<L - 1
@@ -40,7 +41,7 @@ function get_LN1N2_states(L::Int, N1::Int, N2::Int)
 end
 
 """
-    get_spin1_LSz_states(L::Int, Sz::Int)
+    make_spin1_LSz_basis(L::Int, Sz::Int)
 
 Compute states with L spins s=1 and Sz magnetization.
 
@@ -54,7 +55,7 @@ possible states:
 For example, a state with three spins, with magnetization -1, 1, 0 in
 each site, respectively, is represented as: 100100.
 """
-function get_spin1_LSz_states(L::Int, Sz::Int)
+function make_spin1_LSz_basis(L::Int, Sz::Int)
     # Number of states.
     num_states = 0
     l = iseven(L+Sz) ? L : L-1
@@ -94,5 +95,5 @@ end
 Compute the number of states with L sites and Sz magnetization.
 """
 function get_num_spin1_states(L::Int, Sz::Int)
-    return length(get_spin1_LSz_states(L, Sz))
+    return length(make_spin1_LSz_basis(L, Sz))
 end
