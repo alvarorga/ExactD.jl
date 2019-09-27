@@ -91,30 +91,15 @@ end  # testset "basis of Fock states"
 end
 
 @testset "sparse many-body operator" begin
-    L = 4
-    N = 2
-    J::Array{Float64, 2} = reshape(collect(1:L^2), (L, L))
-    Op = build_sparse_many_body_op(L, N, J)
-
-    # Diagonal terms.
-    @test Op[1, 1] ≈ 7.
-    @test Op[4, 4] ≈ 17.
-    @test Op[6, 6] ≈ 27.
-
-    # Off-diagonal terms.
-    @test Op[1, 2] ≈ 10.
-    @test Op[2, 5] ≈ 0.
-    @test Op[4, 2] ≈ 12.
-    @test Op[6, 1] ≈ 0.
-    @test Op[3, 5] ≈ 15.
-
+    L = 6
+    N = 3
+    basis = get_LN_states(L, N)
+    J::Array{Float64, 2} = reshape(sin.(1:L^2), (L, L))
+    V::Array{Float64, 2} = reshape(tan.(1:L^2), (L, L))
     C = 1.3
-    Op2 = build_sparse_many_body_op(L, N, J, C)
-
-    # Diagonal terms.
-    @test Op2[1, 1] ≈ 8.3
-    @test Op2[4, 4] ≈ 18.3
-    @test Op2[6, 6] ≈ 28.3
+    sp_Op = build_sparse_many_body_op(L, basis, J, V, C)
+    de_Op = build_many_body_op(L, basis, J, V, C)
+    @test norm(Array(sp_Op) - de_Op) ≈ 0.0 atol=1e-12
 end
 end  # testset "hard-core boson many body operators"
 

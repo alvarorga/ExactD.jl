@@ -79,41 +79,42 @@ function build_many_body_op(L::Int, states::Vector{Int},
 end
 
 """
-    function build_sparse_many_body_op(L::Int, N::Int,
+    function build_sparse_many_body_op(L::Int,
+                                       states::Vector{Int},
                                        J::AbstractMatrix{T},
-                                       C::T=zero(T)) where T<:Number
+                                       V::AbstractMatrix{T},
+                                       C::T=zero(T)) where {T<:Number}
 
 Build sparse many-body operator from the matrix J with a N particles.
 
 # Arguments:
 - `L::Int`: number of sites.
-- `N::Int`: number of particles.
+- `states::Vector{Int}`: basis of Fock states for the mb operator.
 - `J::AbstractMatrix{T}`: hopping matrix ``b^†_i b_j``
+- `V::AbstractMatrix{T}`: interaction matrix ``n_i n_j``
 - `C::T=zero(T)`: constant term added to the diagonal of the many-body
     operator.
 """
-function build_sparse_many_body_op(L::Int, N::Int,
+function build_sparse_many_body_op(L::Int,
+                                   states::Vector{Int},
                                    J::AbstractMatrix{T},
-                                   C::T=zero(T)) where T<:Number
-    # Basis of states and dimension of the Hilbert space.
-    states = get_LN_states(L, N)
+                                   V::AbstractMatrix{T},
+                                   C::T=zero(T)) where {T<:Number}
+    # Dimension of the Hilbert space.
     dH = length(states)
 
-    # Number of non-zero off-diagonal elts in J.
-    nnz_J = 0
-    for i=1:L, j=1:L
-        if i != j && !iszero(J[i, j])
-            nnz_J += 1
-        end
+    # Use only upper triangular part of `V`.
+    V = deepcopy(V)
+    for i=1:L-1, j=i+1:L
+        V[i, j] += V[j, i]
     end
-    # Number of non-zero values in Op due to one correlator b^d_i b_j.
-    elts_correlator = binomial(L-2, N-1)
-    # Preallocate rows, cols and indices vectors.
+
+    # Number of non-zero off-diagonal elts in J.
+    nnz_J = count(abs.(J) .> 1e-8) - count(abs.(diag(J)) .> 1e-8)
     # Number of nnz elts in Op due to off-diag terms and diag terms.
-    nnz_in_Op = nnz_J*elts_correlator + dH
+    nnz_in_Op = dH*(nnz_J + 1)
     rows = zeros(Int, nnz_in_Op)
     cols = zeros(Int, nnz_in_Op)
-    vals_type = Float64
     vals = zeros(T, nnz_in_Op)
 
     cont = 1
@@ -126,6 +127,11 @@ function build_sparse_many_body_op(L::Int, N::Int,
         for i=0:L-1
             if (state>>i)&1 == 1
                 vals[cont] += J[i+1, i+1]
+            end
+            for j=i+1:L-1
+                if !iszero(V[i+1, j+1]) && (state>>i)&1==1 && (state>>j)&1==1
+                    vals[cont] += V[i+1, j+1]
+                end
             end
         end
         rows[cont] = s
@@ -147,7 +153,11 @@ function build_sparse_many_body_op(L::Int, N::Int,
             end
         end
     end
-    Op = sparse(rows, cols, vals)
+    # Remove zeros from rows, cols, vals.
+    rows = rows[1:cont-1]
+    cols = cols[1:cont-1]
+    vals = vals[1:cont-1]
+    Op = sparse(rows, cols, vals, dH, dH)
     return Op
 end
 
