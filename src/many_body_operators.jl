@@ -3,10 +3,10 @@ export build_many_body_op,
        build_spin1_many_body_op
 
 """
-    function build_many_body_op(L::Int, N::Int,
-                                J::AbstractMatrix{T},
-                                V::AbstractMatrix{T},
-                                C::T=zero(T)) where T<:Number
+    build_many_body_op(L::Int, N::Int,
+                       J::AbstractMatrix{T},
+                       V::AbstractMatrix{T},
+                       C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with N particles.
 """
@@ -19,11 +19,11 @@ function build_many_body_op(L::Int, N::Int,
 end
 
 """
-    function build_many_body_op(L::Int,
-                                basis::Vector{Int},
-                                J::AbstractMatrix{T},
-                                V::AbstractMatrix{T},
-                                C::T=zero(T)) where T<:Number
+    build_many_body_op(L::Int,
+                       basis::Vector{Int},
+                       J::AbstractMatrix{T},
+                       V::AbstractMatrix{T},
+                       C::T=zero(T)) where T<:Number
 
 Build many-body operator from the hopping matrix J with a given basis of states.
 
@@ -84,11 +84,11 @@ function build_many_body_op(L::Int,
 end
 
 """
-    function build_sparse_many_body_op(L::Int,
-                                       basis::Vector{Int},
-                                       J::AbstractMatrix{T},
-                                       V::AbstractMatrix{T},
-                                       C::T=zero(T)) where {T<:Number}
+    build_sparse_many_body_op(L::Int,
+                              basis::Vector{Int},
+                              J::AbstractMatrix{T},
+                              V::AbstractMatrix{T},
+                              C::T=zero(T)) where {T<:Number}
 
 Build sparse many-body operator from the matrix J with a N particles.
 
@@ -166,12 +166,12 @@ function build_sparse_many_body_op(L::Int,
 end
 
 """
-    function build_spin1_many_body_op(L::Int,
-                                      Sz::Int,
-                                      J::AbstractMatrix{T},
-                                      W::AbstractMatrix{T},
-                                      Jz::Vector{T},
-                                      C::T=zero(T)) where T<:Number
+    build_spin1_many_body_op(L::Int,
+                             Sz::Int,
+                             J::AbstractMatrix{T},
+                             W::AbstractMatrix{T},
+                             Jz::Vector{T},
+                             C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 """
@@ -186,18 +186,18 @@ function build_spin1_many_body_op(L::Int,
 end
 
 """
-    function build_spin1_many_body_op(L::Int,
-                                      basis::Vector{Int},
-                                      J::AbstractMatrix{T},
-                                      W::AbstractMatrix{T},
-                                      Jz::Vector{T},
-                                      C::T=zero(T)) where T<:Number
+    build_spin1_many_body_op(L::Int,
+                             basis::Vector{Int},
+                             J::AbstractMatrix{T},
+                             W::AbstractMatrix{T},
+                             Jz::Vector{T},
+                             C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
 
 # Arguments:
 - L::Int: number of sites.
-- Sz::Int: magnetization of the basis.
+- basis::Vector{Int}: basis of Fock states for the mb operator.
 - J::AbstractMatrix{T}: hopping matrix, ignore diagonal values S^+_i*S^-_j.
 - W::AbstractMatrix{T}: interaction matrix S^z_i*S^z_j.
 - Jz::Vector{T}: local Sz terms S^z_i.
