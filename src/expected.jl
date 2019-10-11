@@ -3,14 +3,16 @@ export expected_n,
 
 """
     expected_n(basis::Vector{Int},
-               state::Vector{<:Number},
-               p::Vector{Int})
+               phi::Vector{T},
+               psi::Vector{T},
+               p::Vector{Int}) where {T<:Number}
 
-Compute the expectation value <state|n_p[1]*n_p[2]*...*n_p[n]|state>.
+Compute the expectation value <phi|n_p[1]*n_p[2]*...*n_p[n]|psi>.
 """
 function expected_n(basis::Vector{Int},
-                    state::Vector{<:Number},
-                    p::Vector{Int})
+                    phi::Vector{T},
+                    psi::Vector{T},
+                    p::Vector{Int}) where {T<:Number}
     o = zero(Float64)
     for i in eachindex(basis)
         bs = basis[i]
@@ -18,37 +20,54 @@ function expected_n(basis::Vector{Int},
         for pi in p
             (bs>>(pi-1))&1 == 0 && (has_all_n = false)
         end
-        has_all_n && (o += abs2(state[i]))
+        if has_all_n
+            o += conj(phi[i])*psi[i]
+        end
     end
     return o
 end
 
-expected_n(basis, state, p::Int) = expected_n(basis, state, Int[p])
+"""
+    expected_n(basis::Vector{Int},
+               psi::Vector{T},
+               p::Vector{Int}) where {T<:Number}
+
+Compute the expectation value <psi|n_p[1]*n_p[2]*...*n_p[n]|psi>.
+"""
+function expected_n(basis::Vector{Int},
+                    psi::Vector{T},
+                    p::Vector{Int}) where {T<:Number}
+    return expected_n(basis, psi, psi, p)
+end
+
+expected_n(basis, psi, p::Int) = expected_n(basis, psi, Int[p])
+expected_n(basis, phi, psi, p::Int) = expected_n(basis, phi, psi, Int[p])
 
 """
     expected_pq(basis::Vector{Int},
-                state::Vector{<:Number},
+                phi::Vector{T},
+                psi::Vector{T},
                 p::Vector{Int},
-                q::Vector{Int})
+                q::Vector{Int}) where {T<:Number}
 
-Compute <state|b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]|state>.
+Compute <phi|b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]|psi>.
 """
 function expected_pq(basis::Vector{Int},
-                     state::Vector{<:Number},
+                     phi::Vector{T},
+                     psi::Vector{T},
                      p::Vector{Int},
-                     q::Vector{Int})
+                     q::Vector{Int}) where {T<:Number}
 
     p = deepcopy(p)
     q = deepcopy(q)
-    allunique(p) || return zero(eltype(state))
-    allunique(q) || return zero(eltype(state))
+    (allunique(p) && allunique(q)) || return zero(T)
     # Number operators.
     n_i = p ∩ q
     # Remove those indices where there are number ops from p and q.
     setdiff!(p, n_i)
     setdiff!(q, n_i)
 
-    o = zero(eltype(state))
+    o = zero(T)
     for i in eachindex(basis)
         bs = basis[i]
         has_all_pq = true
@@ -74,12 +93,28 @@ function expected_pq(basis::Vector{Int},
             j = searchsorted(basis, rs)
             # If rs ∈ basis then length(j) = 1, else 0.
             if length(j) == 1
-                # Do state[j][] because j is a range.
-                o += state[i]*conj(state[j][])
+                # Do phi[j][] because j is a range.
+                o += psi[i]*conj(phi[j][])
             end
         end
     end
     return o
 end
 
-expected_pq(basis, state, p::Int, q::Int) = expected_pq(basis, state, [p], [q])
+"""
+    expected_pq(basis::Vector{Int},
+                psi::Vector{<:Number},
+                p::Vector{Int},
+                q::Vector{Int})
+
+Compute <psi|b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]|psi>.
+"""
+function expected_pq(basis::Vector{Int},
+                     psi::Vector{<:Number},
+                     p::Vector{Int},
+                     q::Vector{Int})
+    return expected_pq(basis, psi, psi, p, q)
+end
+
+expected_pq(basis, psi, p::Int, q::Int) = expected_pq(basis, psi, [p], [q])
+expected_pq(basis, phi, psi, p::Int, q::Int) = expected_pq(basis, phi, psi, [p], [q])
