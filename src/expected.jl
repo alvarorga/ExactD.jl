@@ -90,12 +90,8 @@ function expected_pq(basis::Vector{Int},
             for qi in q
                 rs -= 1<<(qi-1)
             end
-            j = searchsorted(basis, rs)
-            # If rs ∈ basis then length(j) = 1, else 0.
-            if length(j) == 1
-                # Do phi[j][] because j is a range.
-                o += psi[i]*conj(phi[j][])
-            end
+            j = searchsortedfirst(basis, rs)
+            o += psi[i]*conj(phi[j])
         end
     end
     return o
