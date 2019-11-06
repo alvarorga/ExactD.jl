@@ -100,17 +100,31 @@ end
 """
     expected_pq(basis::Vector{Int},
                 psi::Vector{<:Number},
-                p::Vector{Int},
-                q::Vector{Int})
+                phi::Vector{<:Number},
+                p::Int,
+                q::Int)
 
-Compute <psi|b^+_p[1]*...*b^+_p[n]*b_q[1]*...*b_q[m]|psi>.
+Compute <phi|b^+_p*b_q|psi>.
 """
 function expected_pq(basis::Vector{Int},
-                     psi::Vector{<:Number},
-                     p::Vector{Int},
-                     q::Vector{Int})
-    return expected_pq(basis, psi, psi, p, q)
+                     psi::Vector{T},
+                     phi::Vector{T},
+                     p::Int,
+                     q::Int) where {T<:Number}
+
+    p == q && return expected_n(basis, psi, phi, Int[p])
+
+    o = zero(T)
+    for i in eachindex(basis)
+        bs = basis[i]
+        if (bs>>(p-1))&1 == 0 && (bs>>(q-1))&1 == 1
+            rs = bs + 1<<(p-1) - 1<<(q-1)
+            j = searchsortedfirst(basis, rs)
+            o += psi[i]*conj(phi[j])
+        end
+    end
+    return o
 end
 
-expected_pq(basis, psi, p::Int, q::Int) = expected_pq(basis, psi, [p], [q])
-expected_pq(basis, phi, psi, p::Int, q::Int) = expected_pq(basis, phi, psi, [p], [q])
+expected_pq(basis, psi, p::Int, q::Int) = expected_pq(basis, psi, psi, p, q)
+expected_pq(basis, psi, p::Vector{Int}, q::Vector{Int}) = expected_pq(basis, psi, psi, p, q)
