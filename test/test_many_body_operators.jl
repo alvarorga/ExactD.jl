@@ -55,8 +55,9 @@ end  # testset "hard-core boson many body operators"
     J = reshape(collect(1.:L^2), (L, L))
     W = reshape(collect(1.:L^2), (L, L))
     Jz = collect(1.:L)/2
+    Jx = zeros(L)
     C = 1.33
-    Op = build_spin1_many_body_op(L, Sz, J, W, Jz, C)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz, Jx, C)
 
     # Diagonal terms: S^z + (S^z_i)^2 + S^z_i*S^z_j.
     @test Op[1, 1] ≈ 1.5 + 7 + 5 + C
@@ -79,8 +80,25 @@ end  # testset "hard-core boson many body operators"
     J = reshape(collect(1.:L^2), (L, L))
     W = reshape(collect(1.:L^2), (L, L))
     Jz = collect(1.:L)/4
-    Op = build_spin1_many_body_op(L, Sz, J, W, Jz)
+    Jx = zeros(L)
+    Op = build_spin1_many_body_op(L, Sz, J, W, Jz, Jx)
     # Off-diagonal terms.
     @test Op[4, 2] ≈ 12.
     @test Op[4, 5] ≈ 4.
+
+    # Test only Sx terms.
+    L = 3
+    basis = make_spin1_L_basis(L)
+    J = zeros(L, L)
+    W = zeros(L, L)
+    Jz = zeros(L)
+    Jx = collect(1.:L)
+    Op = build_spin1_many_body_op(L, basis, J, W, Jz, Jx)
+
+    @test all(Op .≈ transpose(Op))
+    @test Op[1, 3] ≈ 1/sqrt(2)
+    @test Op[1, 2] ≈ 1/sqrt(2)
+    @test Op[12, 15] ≈ 2/sqrt(2)
+    @test Op[12, 18] ≈ 2/sqrt(2)
+    @test Op[27, 9] ≈ 3/sqrt(2)
 end

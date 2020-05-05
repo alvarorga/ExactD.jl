@@ -171,6 +171,7 @@ end
                              J::AbstractMatrix{T},
                              W::AbstractMatrix{T},
                              Jz::Vector{T},
+                             Jx::Vector{T},
                              C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
@@ -180,9 +181,10 @@ function build_spin1_many_body_op(L::Int,
                                   J::AbstractMatrix{T},
                                   W::AbstractMatrix{T},
                                   Jz::Vector{T},
+                                  Jx::Vector{T},
                                   C::T=zero(T)) where T<:Number
     basis = make_spin1_LSz_basis(L, Sz)
-    return build_spin1_many_body_op(L, basis, J, W, Jz, C)
+    return build_spin1_many_body_op(L, basis, J, W, Jz, Jx, C)
 end
 
 """
@@ -191,6 +193,7 @@ end
                              J::AbstractMatrix{T},
                              W::AbstractMatrix{T},
                              Jz::Vector{T},
+                             Jx::Vector{T},
                              C::T=zero(T)) where T<:Number
 
 Build a spin 1 many-body operator from the hopping matrix J.
@@ -201,6 +204,7 @@ Build a spin 1 many-body operator from the hopping matrix J.
 - J::AbstractMatrix{T}: hopping matrix, ignore diagonal values S^+_i*S^-_j.
 - W::AbstractMatrix{T}: interaction matrix S^z_i*S^z_j.
 - Jz::Vector{T}: local Sz terms S^z_i.
+- Jx::Vector{T}: local Sx terms S^x_i.
 - C::T=zero(T): constant term.
 """
 function build_spin1_many_body_op(L::Int,
@@ -208,6 +212,7 @@ function build_spin1_many_body_op(L::Int,
                                   J::AbstractMatrix{T},
                                   W::AbstractMatrix{T},
                                   Jz::Vector{T},
+                                  Jx::Vector{T},
                                   C::T=zero(T)) where T<:Number
     # Dimension of the Hilbert space.
     dH = length(basis)
@@ -252,21 +257,63 @@ function build_spin1_many_body_op(L::Int,
                 if (state>>2i)&3 == 0 && (state>>2j)&3 == 1
                     Jstate = state + 1<<2i - 1<<2j
                     js = searchsortedfirst(basis, Jstate)
-                    Op[js, s] = 2*J[i+1, j+1]
+                    Op[js, s] += 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 0 && (state>>2j)&3 == 0
                     Jstate = state + 1<<2i + 2<<2j
                     js = searchsortedfirst(basis, Jstate)
-                    Op[js, s] = 2*J[i+1, j+1]
+                    Op[js, s] += 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 2 && (state>>2j)&3 == 1
                     Jstate = state - 2<<2i - 1<<2j
                     js = searchsortedfirst(basis, Jstate)
-                    Op[js, s] = 2*J[i+1, j+1]
+                    Op[js, s] += 2*J[i+1, j+1]
                 elseif (state>>2i)&3 == 2 && (state>>2j)&3 == 0
                     Jstate = state - 2<<2i + 2<<2j
                     js = searchsortedfirst(basis, Jstate)
-                    Op[js, s] = 2*J[i+1, j+1]
+                    Op[js, s] += 2*J[i+1, j+1]
                 end
             end
+        end
+    end
+
+    # Sx terms.
+    if norm(Jx) > 1e-8
+        for s=1:dH
+            state = basis[s]
+
+            # S^x_i terms.
+            for i=0:L-1
+                iszero(Jx[i+1]) && continue
+                if (state>>2i)&3 == 0
+                    # state_i = |1, 0>.
+                    Jstate1 = state + 1<<2i # New state: |1, 1>.
+                    js1 = searchsortedfirst(basis, Jstate1)
+                    # If new state is in base.
+                    if js1 <= dH && Jstate1 == basis[js1]
+                        Op[js1, s] += Jx[i+1]/sqrt(2)
+                    end
+
+                    Jstate2 = state + 2<<2i # New state: |1, -1>.
+                    js2 = searchsortedfirst(basis, Jstate2)
+                    if js2 <= dH && Jstate2 == basis[js2]
+                        Op[js2, s] += Jx[i+1]/sqrt(2)
+                    end
+                elseif (state>>2i)&3 == 1
+                    # state_i = |1, 1>.
+                    Jstate = state - 1<<2i # New state: |1, 0>.
+                    js = searchsortedfirst(basis, Jstate)
+                    if js <= dH && Jstate == basis[js]
+                        Op[js, s] += Jx[i+1]/sqrt(2)
+                    end
+                elseif (state>>2i)&3 == 2
+                    # state_i = |1, -1>.
+                    Jstate = state - 2<<2i # New state: |1, 0>.
+                    js = searchsortedfirst(basis, Jstate)
+                    if js <= dH && Jstate == basis[js]
+                        Op[js, s] += Jx[i+1]/sqrt(2)
+                    end
+                end
+            end
+
         end
     end
     return Op
