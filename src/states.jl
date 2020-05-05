@@ -1,6 +1,7 @@
 export make_LN_basis,
        make_LN1N2_basis,
        make_spin1_LSz_basis,
+       make_spin1_L_basis,
        get_num_spin1_states
 
 """
@@ -96,4 +97,30 @@ Compute the number of states with L sites and Sz magnetization.
 """
 function get_num_spin1_states(L::Int, Sz::Int)
     return length(make_spin1_LSz_basis(L, Sz))
+end
+
+"""
+    make_spin1_L_basis(L::Int)
+
+Compute states with L spins s=1.
+
+The states are defined as in make_spin1_LSz_basis.
+"""
+function make_spin1_L_basis(L::Int)
+    num_states = 3^L
+    states = zeros(Int, num_states)
+    cont = 1
+    for i=0:(1<<(2L))-1
+        is_valid = true
+        for j=0:L-1
+            if (i>>(2j))&3 == 3
+                is_valid = false
+            end
+        end
+        if is_valid
+            states[cont] = i
+            cont += 1
+        end
+    end
+    return states
 end

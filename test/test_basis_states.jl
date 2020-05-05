@@ -51,4 +51,16 @@ end
     @test states[16] == 148
     @test get_num_spin1_states(L, Sz) == 16
 end
+
+@testset "spin 1 states with L spins" begin
+    L = 3
+    states = make_spin1_L_basis(L)
+
+    @test length(states) == 27
+    @test states[1] == 0
+    @test states[3] == 2
+    @test states[5] == 5
+    @test states[7] == 8
+    @test states[10] == 16
+end
 end  # testset "basis of Fock states"
